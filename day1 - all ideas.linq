@@ -5,260 +5,260 @@
 
 void Main()
 {
-	part1();
-	part2attempt3();
-	part2attempt1WorkingParser();
+    part1();
+    part2attempt3();
+    part2attempt1WorkingParser();
 }
 
 void part1()
 {
-	data
-	.Split(Environment.NewLine)
-	.Select(line => line.Where(char.IsDigit))
-	.Select(ar => (ar.First() - '0', ar.Last() - '0'))
-	.Select(d => (d.Item1 * 10) + d.Item2)
-	.Sum()
-	.Dump();
+    data
+    .Split(Environment.NewLine)
+    .Select(line => line.Where(char.IsDigit))
+    .Select(ar => (ar.First() - '0', ar.Last() - '0'))
+    .Select(d => (d.Item1 * 10) + d.Item2)
+    .Sum()
+    .Dump();
 }
 
 void part2attempt3()
 {
-	int getNumber(string line)
-	{
-		var allNumbers =
-				findFirstAndLast(1, '1', "one")
-				.Concat(findFirstAndLast(2, '2', "two"))
-				.Concat(findFirstAndLast(3, '3', "three"))
-				.Concat(findFirstAndLast(4, '4', "four"))
-				.Concat(findFirstAndLast(5, '5', "five"))
-				.Concat(findFirstAndLast(6, '6', "six"))
-				.Concat(findFirstAndLast(7, '7', "seven"))
-				.Concat(findFirstAndLast(8, '8', "eight"))
-				.Concat(findFirstAndLast(9, '9', "nine"))
-				.Where(x => x.index != -1)
-				.OrderBy(x => x.index)
-				.ToArray();
+    int getNumber(string line)
+    {
+        var allNumbers =
+                findFirstAndLast(1, '1', "one")
+                .Concat(findFirstAndLast(2, '2', "two"))
+                .Concat(findFirstAndLast(3, '3', "three"))
+                .Concat(findFirstAndLast(4, '4', "four"))
+                .Concat(findFirstAndLast(5, '5', "five"))
+                .Concat(findFirstAndLast(6, '6', "six"))
+                .Concat(findFirstAndLast(7, '7', "seven"))
+                .Concat(findFirstAndLast(8, '8', "eight"))
+                .Concat(findFirstAndLast(9, '9', "nine"))
+                .Where(x => x.index != -1)
+                .OrderBy(x => x.index)
+                .ToArray();
 
-		return allNumbers.First().value * 10 + allNumbers.Last().value;
+        return allNumbers.First().value * 10 + allNumbers.Last().value;
 
-		IEnumerable<(int value, int index)> findFirstAndLast(int i, char c, string s)
-		{
-			yield return (i, line.IndexOf(c));
-			yield return (i, line.IndexOf(s));
-			yield return (i, line.LastIndexOf(c));
-			yield return (i, line.LastIndexOf(s));
-		}
-	}
+        IEnumerable<(int value, int index)> findFirstAndLast(int i, char c, string s)
+        {
+            yield return (i, line.IndexOf(c));
+            yield return (i, line.IndexOf(s));
+            yield return (i, line.LastIndexOf(c));
+            yield return (i, line.LastIndexOf(s));
+        }
+    }
 
-	data
-	.Split(Environment.NewLine)
-	.Select(getNumber)
-	.Sum()
-	.Dump();
+    data
+    .Split(Environment.NewLine)
+    .Select(getNumber)
+    .Sum()
+    .Dump();
 }
 
 
 void part2attempt1()
 {
-	// this parser does garantee i get the 1st number always correct...
-	// but not the last number..
+    // this parser does garantee i get the 1st number always correct...
+    // but not the last number..
 
-	var p1 = Parse.String("one").Return(1);
-	var p2 = Parse.String("two").Return(2);
-	var p3 = Parse.String("three").Return(3);
-	var p4 = Parse.String("four").Return(4);
-	var p5 = Parse.String("five").Return(5);
-	var p6 = Parse.String("six").Return(6);
-	var p7 = Parse.String("seven").Return(7);
-	var p8 = Parse.String("eight").Return(8);
-	var p9 = Parse.String("nine").Return(9);
+    var p1 = Parse.String("one").Return(1);
+    var p2 = Parse.String("two").Return(2);
+    var p3 = Parse.String("three").Return(3);
+    var p4 = Parse.String("four").Return(4);
+    var p5 = Parse.String("five").Return(5);
+    var p6 = Parse.String("six").Return(6);
+    var p7 = Parse.String("seven").Return(7);
+    var p8 = Parse.String("eight").Return(8);
+    var p9 = Parse.String("nine").Return(9);
 
-	var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
-	var numberChar =
-			from c in Parse.Digit
-			select c - '0';
+    var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
+    var numberChar =
+            from c in Parse.Digit
+            select c - '0';
 
-	var allNumbers = numberChar.Or(wordNumber);
-	var nonNum = Parse.AnyChar.Return(-1);
+    var allNumbers = numberChar.Or(wordNumber);
+    var nonNum = Parse.AnyChar.Return(-1);
 
-	var fullLineParser =
-		from c in allNumbers.Or(nonNum).Many()
-		select c.Where(x => x != -1);
+    var fullLineParser =
+        from c in allNumbers.Or(nonNum).Many()
+        select c.Where(x => x != -1);
 
-	data
-	.Split(Environment.NewLine)
-	.Select(line => fullLineParser.Parse(line))
+    data
+    .Split(Environment.NewLine)
+    .Select(line => fullLineParser.Parse(line))
 
-	//.Dump()
-	.Select(d => (d.First() * 10) + d.Last())
-	//.Dump()
-	.Sum()
-	.Dump();
+    //.Dump()
+    .Select(d => (d.First() * 10) + d.Last())
+    //.Dump()
+    .Sum()
+    .Dump();
 }
 
 void part2attempt1WorkingParser()
 {
-	// this parses all the combos!
+    // this parses all the combos!
 
-	var p1 = Parse.String("one").Return(new[] { 1 });
-	var p2 = Parse.String("two").Return(new[] { 2 });
-	var p3 = Parse.String("three").Return(new[] { 3 });
-	var p4 = Parse.String("four").Return(new[] { 4 });
-	var p5 = Parse.String("five").Return(new[] { 5 });
-	var p6 = Parse.String("six").Return(new[] { 6 });
-	var p7 = Parse.String("seven").Return(new[] { 7 });
-	var p8 = Parse.String("eight").Return(new[] { 8 });
-	var p9 = Parse.String("nine").Return(new[] { 9 });
+    var p1 = Parse.String("one").Return(new[] { 1 });
+    var p2 = Parse.String("two").Return(new[] { 2 });
+    var p3 = Parse.String("three").Return(new[] { 3 });
+    var p4 = Parse.String("four").Return(new[] { 4 });
+    var p5 = Parse.String("five").Return(new[] { 5 });
+    var p6 = Parse.String("six").Return(new[] { 6 });
+    var p7 = Parse.String("seven").Return(new[] { 7 });
+    var p8 = Parse.String("eight").Return(new[] { 8 });
+    var p9 = Parse.String("nine").Return(new[] { 9 });
 
-	Parser<IEnumerable<int>>
-	oneCombo = null,
-	twoCombo = null,
-	threeCombo = null,
-	fiveCombo = null,
-	sevenCombo = null,
-	eightCombo = null,
-	nineCombo = null;
+    Parser<IEnumerable<int>>
+    oneCombo = null,
+    twoCombo = null,
+    threeCombo = null,
+    fiveCombo = null,
+    sevenCombo = null,
+    eightCombo = null,
+    nineCombo = null;
 
-	oneCombo =
-		from _1 in Parse.String("on")
-		from nums in eightCombo.Or(p8)
-		select nums.Prepend(1);
+    oneCombo =
+        from _1 in Parse.String("on")
+        from nums in eightCombo.Or(p8)
+        select nums.Prepend(1);
 
-	twoCombo =
-		from _1 in Parse.String("tw")
-		from nums in oneCombo.Or(p1)
-		select nums.Prepend(2);
+    twoCombo =
+        from _1 in Parse.String("tw")
+        from nums in oneCombo.Or(p1)
+        select nums.Prepend(2);
 
-	threeCombo =
-		from _1 in Parse.String("thre")
-		from nums in eightCombo.Or(p8)
-		select nums.Prepend(3);
+    threeCombo =
+        from _1 in Parse.String("thre")
+        from nums in eightCombo.Or(p8)
+        select nums.Prepend(3);
 
-	fiveCombo =
-		from _1 in Parse.String("fiv")
-		from nums in eightCombo.Or(p8)
-		select nums.Prepend(5);
+    fiveCombo =
+        from _1 in Parse.String("fiv")
+        from nums in eightCombo.Or(p8)
+        select nums.Prepend(5);
 
-	sevenCombo =
-		from _1 in Parse.String("seve")
-		from nums in nineCombo.Or(p9)
-		select nums.Prepend(7);
+    sevenCombo =
+        from _1 in Parse.String("seve")
+        from nums in nineCombo.Or(p9)
+        select nums.Prepend(7);
 
-	eightCombo =
-		from _1 in Parse.String("eigh")
-		from nums in twoCombo.Or(threeCombo).Or(p2).Or(p3)
-		select nums.Prepend(8);
+    eightCombo =
+        from _1 in Parse.String("eigh")
+        from nums in twoCombo.Or(threeCombo).Or(p2).Or(p3)
+        select nums.Prepend(8);
 
-	nineCombo =
-		from _1 in Parse.String("nin")
-		from nums in eightCombo.Or(p8)
-		select nums.Prepend(9);
+    nineCombo =
+        from _1 in Parse.String("nin")
+        from nums in eightCombo.Or(p8)
+        select nums.Prepend(9);
 
-	var combos = oneCombo.Or(twoCombo).Or(threeCombo).Or(fiveCombo)
-					.Or(sevenCombo).Or(eightCombo).Or(nineCombo);
+    var combos = oneCombo.Or(twoCombo).Or(threeCombo).Or(fiveCombo)
+                    .Or(sevenCombo).Or(eightCombo).Or(nineCombo);
 
-	var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
-	var numberChar =
-			from c in Parse.Digit
-			select new[] { c - '0' };
+    var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
+    var numberChar =
+            from c in Parse.Digit
+            select new[] { c - '0' };
 
-	var allNumbers = combos.Or(numberChar).Or(wordNumber);
+    var allNumbers = combos.Or(numberChar).Or(wordNumber);
 
-	var nonNum = Parse.AnyChar.Return(new[] { -1 });
+    var nonNum = Parse.AnyChar.Return(new[] { -1 });
 
-	var fullLineParser =
-		from c in allNumbers.Or(nonNum).Many()
-		select c.SelectMany(x => x).Where(x => x != -1);
+    var fullLineParser =
+        from c in allNumbers.Or(nonNum).Many()
+        select c.SelectMany(x => x).Where(x => x != -1);
 
-	data
-	.Split(Environment.NewLine)
-	.Select(line => fullLineParser.Parse(line))
-	//.Dump()
-	.Select(d => (d.First() * 10) + d.Last())
-	//.Dump()
-	.Sum()
-	.Dump();
+    data
+    .Split(Environment.NewLine)
+    .Select(line => fullLineParser.Parse(line))
+    //.Dump()
+    .Select(d => (d.First() * 10) + d.Last())
+    //.Dump()
+    .Sum()
+    .Dump();
 }
 
 
 void part2attempt2()
 {
-	// this failed. didn't like the idea of writing out all the combined number options.
+    // this failed. didn't like the idea of writing out all the combined number options.
 
-	string fix(string s)
-	{
-		return s
-			.Replace("eightwo", "82")
-			.Replace("eighthree", "83")
-			.Replace("twone", "21")
-			.Replace("threeight", "38")
-			.Replace("one", "1")
-			.Replace("two", "2")
-			.Replace("three", "3")
-			.Replace("four", "4")
-			.Replace("five", "5")
-			.Replace("six", "6")
-			.Replace("seven", "7")
-			.Replace("eight", "8")
-			.Replace("nine", "9");
-	}
+    string fix(string s)
+    {
+        return s
+            .Replace("eightwo", "82")
+            .Replace("eighthree", "83")
+            .Replace("twone", "21")
+            .Replace("threeight", "38")
+            .Replace("one", "1")
+            .Replace("two", "2")
+            .Replace("three", "3")
+            .Replace("four", "4")
+            .Replace("five", "5")
+            .Replace("six", "6")
+            .Replace("seven", "7")
+            .Replace("eight", "8")
+            .Replace("nine", "9");
+    }
 
-	data
-	.Split(Environment.NewLine)
-	.Select(line => fix(line).Where(char.IsDigit).ToArray())
-	.Select(ar => (ar[0] - '0', ar[ar.Length - 1] - '0'))
-	.Select(d => (d.Item1 * 10) + d.Item2)
-	.Sum()
-	.Dump();
+    data
+    .Split(Environment.NewLine)
+    .Select(line => fix(line).Where(char.IsDigit).ToArray())
+    .Select(ar => (ar[0] - '0', ar[ar.Length - 1] - '0'))
+    .Select(d => (d.Item1 * 10) + d.Item2)
+    .Sum()
+    .Dump();
 }
 
 void part3_findTheDifference()
 {
-	// why were numbers different?
+    // why were numbers different?
 
-	var p1 = Parse.String("one").Return(1);
-	var p2 = Parse.String("two").Return(2);
-	var p3 = Parse.String("three").Return(3);
-	var p4 = Parse.String("four").Return(4);
-	var p5 = Parse.String("five").Return(5);
-	var p6 = Parse.String("six").Return(6);
-	var p7 = Parse.String("seven").Return(7);
-	var p8 = Parse.String("eight").Return(8);
-	var p9 = Parse.String("nine").Return(9);
+    var p1 = Parse.String("one").Return(1);
+    var p2 = Parse.String("two").Return(2);
+    var p3 = Parse.String("three").Return(3);
+    var p4 = Parse.String("four").Return(4);
+    var p5 = Parse.String("five").Return(5);
+    var p6 = Parse.String("six").Return(6);
+    var p7 = Parse.String("seven").Return(7);
+    var p8 = Parse.String("eight").Return(8);
+    var p9 = Parse.String("nine").Return(9);
 
-	var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
-	var numberChar =
-			from c in Parse.Digit
-			select c - '0';
+    var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
+    var numberChar =
+            from c in Parse.Digit
+            select c - '0';
 
-	var allNumbers = numberChar.Or(wordNumber);
-	var nonNum = Parse.AnyChar.Return(-1);
+    var allNumbers = numberChar.Or(wordNumber);
+    var nonNum = Parse.AnyChar.Return(-1);
 
-	var fullLineParser =
-		from c in allNumbers.Or(nonNum).Many()
-		select c.Where(x => x != -1);
+    var fullLineParser =
+        from c in allNumbers.Or(nonNum).Many()
+        select c.Where(x => x != -1);
 
-	string fix(string s)
-	{
-		return s.Replace("one", "1")
-			.Replace("two", "2")
-			.Replace("three", "3")
-			.Replace("four", "4")
-			.Replace("five", "5")
-			.Replace("six", "6")
-			.Replace("seven", "7")
-			.Replace("eight", "8")
-			.Replace("nine", "9");
-	}
+    string fix(string s)
+    {
+        return s.Replace("one", "1")
+            .Replace("two", "2")
+            .Replace("three", "3")
+            .Replace("four", "4")
+            .Replace("five", "5")
+            .Replace("six", "6")
+            .Replace("seven", "7")
+            .Replace("eight", "8")
+            .Replace("nine", "9");
+    }
 
-	data
-	.Split(Environment.NewLine)
-	.Select(line =>
-		(line,
-			fullLineParser.Parse(line),
-			fix(line).Where(char.IsDigit).Select(c => c - '0'))
-	)
-	.Where(x => !Enumerable.SequenceEqual(x.Item2, x.Item3));
+    data
+    .Split(Environment.NewLine)
+    .Select(line =>
+        (line,
+            fullLineParser.Parse(line),
+            fix(line).Where(char.IsDigit).Select(c => c - '0'))
+    )
+    .Where(x => !Enumerable.SequenceEqual(x.Item2, x.Item3));
 }
 
 

@@ -5,55 +5,55 @@
 
 void Main()
 {
-	part1();
-	part2attempt3();
+    part1();
+    part2attempt3();
 }
 
 void part1()
 {
-	data
-	.Split(Environment.NewLine)
-	.Select(line => line.Where(char.IsDigit))
-	.Select(ar => (ar.First() - '0', ar.Last() - '0'))
-	.Select(d => (d.Item1 * 10) + d.Item2)
-	.Sum()
-	.Dump();
+    data
+    .Split(Environment.NewLine)
+    .Select(line => line.Where(char.IsDigit))
+    .Select(ar => (ar.First() - '0', ar.Last() - '0'))
+    .Select(d => (d.Item1 * 10) + d.Item2)
+    .Sum()
+    .Dump();
 }
 
 void part2attempt3()
 {
-	int getNumber(string line)
-	{
-		var allNumbers =
-				findFirstAndLast(1, '1', "one")
-				.Concat(findFirstAndLast(2, '2', "two"))
-				.Concat(findFirstAndLast(3, '3', "three"))
-				.Concat(findFirstAndLast(4, '4', "four"))
-				.Concat(findFirstAndLast(5, '5', "five"))
-				.Concat(findFirstAndLast(6, '6', "six"))
-				.Concat(findFirstAndLast(7, '7', "seven"))
-				.Concat(findFirstAndLast(8, '8', "eight"))
-				.Concat(findFirstAndLast(9, '9', "nine"))
-				.Where(x => x.index != -1)
-				.OrderBy(x => x.index)
-				.ToArray();
+    int getNumber(string line)
+    {
+        var allNumbers =
+                findFirstAndLast(1, '1', "one")
+                .Concat(findFirstAndLast(2, '2', "two"))
+                .Concat(findFirstAndLast(3, '3', "three"))
+                .Concat(findFirstAndLast(4, '4', "four"))
+                .Concat(findFirstAndLast(5, '5', "five"))
+                .Concat(findFirstAndLast(6, '6', "six"))
+                .Concat(findFirstAndLast(7, '7', "seven"))
+                .Concat(findFirstAndLast(8, '8', "eight"))
+                .Concat(findFirstAndLast(9, '9', "nine"))
+                .Where(x => x.index != -1)
+                .OrderBy(x => x.index)
+                .ToArray();
 
-		return allNumbers.First().value * 10 + allNumbers.Last().value;
+        return allNumbers.First().value * 10 + allNumbers.Last().value;
 
-		IEnumerable<(int value, int index)> findFirstAndLast(int i, char c, string s)
-		{
-			yield return (i, line.IndexOf(c));
-			yield return (i, line.IndexOf(s));
-			yield return (i, line.LastIndexOf(c));
-			yield return (i, line.LastIndexOf(s));
-		}
-	}
+        IEnumerable<(int value, int index)> findFirstAndLast(int i, char c, string s)
+        {
+            yield return (i, line.IndexOf(c));
+            yield return (i, line.IndexOf(s));
+            yield return (i, line.LastIndexOf(c));
+            yield return (i, line.LastIndexOf(s));
+        }
+    }
 
-	data
-	.Split(Environment.NewLine)
-	.Select(getNumber)
-	.Sum()
-	.Dump();
+    data
+    .Split(Environment.NewLine)
+    .Select(getNumber)
+    .Sum()
+    .Dump();
 }
 
 const string data = """
