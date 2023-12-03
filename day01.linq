@@ -1,7 +1,4 @@
-<Query Kind="Program">
-  <NuGetReference>Sprache</NuGetReference>
-  <Namespace>Sprache</Namespace>
-</Query>
+<Query Kind="Program" />
 
 void Main()
 {

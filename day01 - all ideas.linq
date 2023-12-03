@@ -7,7 +7,7 @@ void Main()
 {
     part1();
     part2attempt3();
-    part2attempt1WorkingParser();
+    part2attempt1WorkingRecursiveParser();
 }
 
 void part1()
@@ -96,7 +96,7 @@ void part2attempt1()
     .Dump();
 }
 
-void part2attempt1WorkingParser()
+void part2attempt1WorkingRecursiveParser()
 {
     // this parses all the combos!
 
