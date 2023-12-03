@@ -2,195 +2,195 @@
 
 void Main()
 {
-	part1();
-	part2();
+    part1();
+    part2();
 }
 
 void part1()
 {
-	var lines = data
-				.Split(Environment.NewLine)
-				.Select((line, lineIndex) => (line, lineIndex))
-				.ToArray();
+    var lines = data
+                .Split(Environment.NewLine)
+                .Select((line, lineIndex) => (line, lineIndex))
+                .ToArray();
 
-	var nums = lines
-				.Select(numsAndIndexes)
-				.SelectMany(x => x);
+    var nums = lines
+                .Select(numsAndIndexes)
+                .SelectMany(x => x);
 
-	var goods = nums.Where(num => NextToSymbol(num, lines));
+    var goods = nums.Where(num => NextToSymbol(num, lines));
 
-	goods
-	.Select(g => g.Item1)
-	.Sum()
-	.Dump()
-	;
+    goods
+    .Select(g => g.Item1)
+    .Sum()
+    .Dump()
+    ;
 }
 
 bool NextToSymbol((int, List<(int, int, char)>) num, (string line, int lineIndex)[] lines)
 {
-	foreach (var digitAndIndexs in num.Item2)
-	{
-		var lin = digitAndIndexs.Item1;
-		var aboveLin = Math.Max(lin - 1, 0);
-		var belowLin = Math.Min(lin + 1, lines.Length - 1);
+    foreach (var digitAndIndexs in num.Item2)
+    {
+        var lin = digitAndIndexs.Item1;
+        var aboveLin = Math.Max(lin - 1, 0);
+        var belowLin = Math.Min(lin + 1, lines.Length - 1);
 
-		var checkLines = new[] {
-			lines[lin].line,
-			lines[aboveLin].line,
-			lines[belowLin].line
-		};
+        var checkLines = new[] {
+            lines[lin].line,
+            lines[aboveLin].line,
+            lines[belowLin].line
+        };
 
-		var startIndex = digitAndIndexs.Item2;
-		var prevIndex = Math.Max(startIndex - 1, 0);
-		var nextIndex = Math.Min(startIndex + 1, lines[lin].line.Length - 1);
+        var startIndex = digitAndIndexs.Item2;
+        var prevIndex = Math.Max(startIndex - 1, 0);
+        var nextIndex = Math.Min(startIndex + 1, lines[lin].line.Length - 1);
 
-		var chars = checkLines
-					.Select(l => new[]
-					{
-						l[startIndex],
-						l[prevIndex],
-						l[nextIndex]
-					})
-					.SelectMany(c => c)
-		;
+        var chars = checkLines
+                    .Select(l => new[]
+                    {
+                        l[startIndex],
+                        l[prevIndex],
+                        l[nextIndex]
+                    })
+                    .SelectMany(c => c)
+        ;
 
-		if (chars.Any(isSymbol))
-		{
-			return true;
-		}
-	}
+        if (chars.Any(isSymbol))
+        {
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 bool isSymbol(char c)
 {
-	return !char.IsDigit(c) && c != '.';
+    return !char.IsDigit(c) && c != '.';
 }
 
 IEnumerable<(int, List<(int, int, char)>)> numsAndIndexes((string line, int lineIndex) info)
 {
-	var numberStarted = false;
-	var digits = new List<(int, int, char)>();
-	var charIndex = -1;
+    var numberStarted = false;
+    var digits = new List<(int, int, char)>();
+    var charIndex = -1;
 
-	foreach (var nextChar in info.line)
-	{
-		charIndex++;
+    foreach (var nextChar in info.line)
+    {
+        charIndex++;
 
-		if (!numberStarted)
-		{
-			if (char.IsDigit(nextChar))
-			{
-				numberStarted = true;
-				digits.Add((info.lineIndex, charIndex, nextChar));
-				continue;
-			}
-		}
+        if (!numberStarted)
+        {
+            if (char.IsDigit(nextChar))
+            {
+                numberStarted = true;
+                digits.Add((info.lineIndex, charIndex, nextChar));
+                continue;
+            }
+        }
 
-		if (numberStarted)
-		{
-			if (char.IsDigit(nextChar))
-			{
-				digits.Add((info.lineIndex, charIndex, nextChar));
-				continue;
-			}
-			else
-			{
-				var item = digits.Select(x => x.Item3).CharsToString();
-				var num = int.Parse(item);
-				yield return (num, digits);
+        if (numberStarted)
+        {
+            if (char.IsDigit(nextChar))
+            {
+                digits.Add((info.lineIndex, charIndex, nextChar));
+                continue;
+            }
+            else
+            {
+                var item = digits.Select(x => x.Item3).CharsToString();
+                var num = int.Parse(item);
+                yield return (num, digits);
 
-				numberStarted = false;
-				digits = new List<(int, int, char)>();
-			}
-		}
-	}
+                numberStarted = false;
+                digits = new List<(int, int, char)>();
+            }
+        }
+    }
 
-	if (numberStarted)
-	{
-		var item = digits.Select(x => x.Item3).CharsToString();
-		var num = int.Parse(item);
-		yield return (num, digits);
-	}
+    if (numberStarted)
+    {
+        var item = digits.Select(x => x.Item3).CharsToString();
+        var num = int.Parse(item);
+        yield return (num, digits);
+    }
 }
 
 void part2()
 {
-	var lines = data
-		.Split(Environment.NewLine)
-		.Select((line, lineIndex) => (line, lineIndex))
-		.ToArray()
-		;
+    var lines = data
+        .Split(Environment.NewLine)
+        .Select((line, lineIndex) => (line, lineIndex))
+        .ToArray()
+        ;
 
-	var nums = lines.Select(numsAndIndexes)
-				.SelectMany(x => x);
+    var nums = lines.Select(numsAndIndexes)
+                .SelectMany(x => x);
 
-	var nextToStars = nums
-					.Select(n => withSymbols(n, lines))
-					.Where(num => num.Item2.Any(x => x.Item3 == '*'));
+    var nextToStars = nums
+                    .Select(n => withSymbols(n, lines))
+                    .Where(num => num.Item2.Any(x => x.Item3 == '*'));
 
-	var stars = nextToStars
-				.SelectMany(ts => ts.Item2.Where(i => i.Item3 == '*'))
-				.Distinct();
+    var stars = nextToStars
+                .SelectMany(ts => ts.Item2.Where(i => i.Item3 == '*'))
+                .Distinct();
 
-	var starGroups = stars
-					.Select(star => nextToStars.Where(ns => ns.Item2.Any(x => x == star)))
-					.Where(group => group.Count() == 2);
+    var starGroups = stars
+                    .Select(star => nextToStars.Where(ns => ns.Item2.Any(x => x == star)))
+                    .Where(group => group.Count() == 2);
 
-	var groupPows = starGroups
-					.Select(group => group.Select(x => x.Item1.Item1).Aggregate((x, y) => x * y));
+    var groupPows = starGroups
+                    .Select(group => group.Select(x => x.Item1.Item1).Aggregate((x, y) => x * y));
 
-	groupPows
-	.Sum()
-	.Dump()
-	;
+    groupPows
+    .Sum()
+    .Dump()
+    ;
 }
 
 
 ((int, List<(int, int, char)>), List<(int, int, char)>) withSymbols(
-	(int, List<(int, int, char)>) num,
-	(string line, int lineIndex)[] lines
+    (int, List<(int, int, char)>) num,
+    (string line, int lineIndex)[] lines
 )
 {
-	var syms = new List<(int, int, char)>();
+    var syms = new List<(int, int, char)>();
 
-	foreach (var digitAndIndexs in num.Item2)
-	{
-		var lin = digitAndIndexs.Item1;
-		var aboveLin = Math.Max(lin - 1, 0);
-		var belowLin = Math.Min(lin + 1, lines.Length - 1);
+    foreach (var digitAndIndexs in num.Item2)
+    {
+        var lin = digitAndIndexs.Item1;
+        var aboveLin = Math.Max(lin - 1, 0);
+        var belowLin = Math.Min(lin + 1, lines.Length - 1);
 
-		var checkLines = new[] {
-			(lin, lines[lin].line),
-			(aboveLin, lines[aboveLin].line),
-			(belowLin, lines[belowLin].line)
-		};
+        var checkLines = new[] {
+            (lin, lines[lin].line),
+            (aboveLin, lines[aboveLin].line),
+            (belowLin, lines[belowLin].line)
+        };
 
-		var startIndex = digitAndIndexs.Item2;
-		var prevIndex = Math.Max(startIndex - 1, 0);
-		var nextIndex = Math.Min(startIndex + 1, lines[lin].line.Length - 1);
+        var startIndex = digitAndIndexs.Item2;
+        var prevIndex = Math.Max(startIndex - 1, 0);
+        var nextIndex = Math.Min(startIndex + 1, lines[lin].line.Length - 1);
 
-		var chars = checkLines
-					.Select(l => new[]
-					{
-						(l.Item1, startIndex, l.line[startIndex]),
-						(l.Item1, prevIndex, l.line[prevIndex]),
-						(l.Item1, nextIndex, l.line[nextIndex])
-					})
-					.SelectMany(c => c)
-		;
+        var chars = checkLines
+                    .Select(l => new[]
+                    {
+                        (l.Item1, startIndex, l.line[startIndex]),
+                        (l.Item1, prevIndex, l.line[prevIndex]),
+                        (l.Item1, nextIndex, l.line[nextIndex])
+                    })
+                    .SelectMany(c => c)
+        ;
 
-		foreach (var c in chars)
-		{
-			if (isSymbol(c.Item3))
-			{
-				syms.Add(c);
-			}
-		}
-	}
+        foreach (var c in chars)
+        {
+            if (isSymbol(c.Item3))
+            {
+                syms.Add(c);
+            }
+        }
+    }
 
-	return (num, syms.Distinct().ToList());
+    return (num, syms.Distinct().ToList());
 }
 
 
