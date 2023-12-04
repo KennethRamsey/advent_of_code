@@ -14,58 +14,21 @@ void part1()
                 .ToArray();
 
     var nums = lines
-                .Select(numsAndIndexes)
+                .Select(NumsAndIndexes)
                 .SelectMany(x => x);
 
-    var goods = nums.Where(num => NextToSymbol(num, lines));
+    var partNumbers = nums
+                    .Select(num => WithSymbols(num, lines))
+                    .Where(num => num.symbols.Any());
 
-    goods
+    partNumbers
     .Select(g => g.number)
     .Sum()
-    .Dump()
-    ;
+    .Dump();
 }
-
-bool NextToSymbol(numAndPositions num, (string line, int lineIndex)[] lines)
-{
-    foreach (var digitAndPositions in num.digits)
-    {
-        var lin = digitAndPositions.lineIndex;
-        var aboveLin = Math.Max(lin - 1, 0);
-        var belowLin = Math.Min(lin + 1, lines.Length - 1);
-
-        var checkLines = new[] {
-            lines[lin].line,
-            lines[aboveLin].line,
-            lines[belowLin].line
-        };
-
-        var startIndex = digitAndPositions.charIndex;
-        var prevIndex = Math.Max(startIndex - 1, 0);
-        var nextIndex = Math.Min(startIndex + 1, lines[lin].line.Length - 1);
-
-        var chars = checkLines
-                    .Select(l => new[]
-                    {
-                        l[startIndex],
-                        l[prevIndex],
-                        l[nextIndex]
-                    })
-                    .SelectMany(c => c)
-        ;
-
-        if (chars.Any(isSymbol))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 
 record struct MyChar(int lineIndex, int charIndex, char Letter);
-record struct numAndPositions(int number, List<MyChar> digits, List<MyChar> symbols = null);
+record struct NumWithPositions(int number, List<MyChar> digits, List<MyChar> symbols = null);
 
 
 bool isSymbol(char c)
@@ -73,86 +36,41 @@ bool isSymbol(char c)
     return !char.IsDigit(c) && c != '.';
 }
 
-IEnumerable<numAndPositions> numsAndIndexes((string line, int lineIndex) info)
+IEnumerable<NumWithPositions> NumsAndIndexes((string line, int lineIndex) info)
 {
-    var numberStarted = false;
     var digits = new List<MyChar>();
+    var numberStarted = () => digits.Any();
     var charIndex = -1;
 
     foreach (var nextChar in info.line)
     {
         charIndex++;
 
-        if (!numberStarted)
+        if (char.IsDigit(nextChar))
         {
-            if (char.IsDigit(nextChar))
-            {
-                numberStarted = true;
-                digits.Add(new MyChar(info.lineIndex, charIndex, nextChar));
-                continue;
-            }
+            digits.Add(new MyChar(info.lineIndex, charIndex, nextChar));
+            continue;
         }
 
-        if (numberStarted)
+        if (numberStarted())
         {
-            if (char.IsDigit(nextChar))
-            {
-                digits.Add(new MyChar(info.lineIndex, charIndex, nextChar));
-                continue;
-            }
-            else
-            {
-                var item = digits.Select(x => x.Letter).CharsToString();
-                var num = int.Parse(item);
-                yield return new numAndPositions(num, digits);
+            var fullnumber = digits.Select(x => x.Letter).CharsToString();
+            var num = int.Parse(fullnumber);
+            yield return new NumWithPositions(num, digits);
 
-                numberStarted = false;
-                digits = new List<MyChar>();
-            }
+            digits = new List<MyChar>();
         }
     }
 
-    if (numberStarted)
+    if (numberStarted())
     {
-        var item = digits.Select(x => x.Letter).CharsToString();
-        var num = int.Parse(item);
-        yield return new numAndPositions(num, digits);
+        var fullnumber = digits.Select(x => x.Letter).CharsToString();
+        var num = int.Parse(fullnumber);
+        yield return new NumWithPositions(num, digits);
     }
 }
 
-void part2()
-{
-    var lines = data
-        .Split(Environment.NewLine)
-        .Select((line, lineIndex) => (line, lineIndex))
-        .ToArray();
-
-    var nums = lines.Select(numsAndIndexes)
-                .SelectMany(x => x);
-
-    var nextToStars = nums
-                    .Select(n => withSymbols(n, lines))
-                    .Where(num => num.symbols.Any(x => x.Letter == '*'));
-
-    var stars = nextToStars
-                .SelectMany(ts => ts.symbols.Where(i => i.Letter == '*'))
-                .Distinct();
-
-    var starGroups = stars
-                    .Select(star => nextToStars.Where(ns => ns.symbols.Any(x => x == star)))
-                    .Where(group => group.Count() == 2);
-
-    var groupPows = starGroups
-                    .Select(group => group.Select(x => x.number).Aggregate((x, y) => x * y));
-
-    groupPows
-    .Sum()
-    .Dump()
-    ;
-}
-
-
-numAndPositions withSymbols(numAndPositions num, (string line, int lineIndex)[] lines)
+NumWithPositions WithSymbols(NumWithPositions num, (string line, int lineIndex)[] lines)
 {
     var syms = new List<MyChar>();
 
@@ -162,7 +80,8 @@ numAndPositions withSymbols(numAndPositions num, (string line, int lineIndex)[] 
         var aboveLin = Math.Max(lin - 1, 0);
         var belowLin = Math.Min(lin + 1, lines.Length - 1);
 
-        var checkLines = new[] {
+        var checkLines = new[]
+        {
             (lin, lines[lin].line),
             (aboveLin, lines[aboveLin].line),
             (belowLin, lines[belowLin].line)
@@ -193,6 +112,37 @@ numAndPositions withSymbols(numAndPositions num, (string line, int lineIndex)[] 
     return num with { symbols = syms.Distinct().ToList() };
 }
 
+
+void part2()
+{
+    var lines = data
+                .Split(Environment.NewLine)
+                .Select((line, lineIndex) => (line, lineIndex))
+                .ToArray();
+
+    var nums = lines
+                .Select(NumsAndIndexes)
+                .SelectMany(x => x);
+
+    var partsNextToStars = nums
+                            .Select(n => WithSymbols(n, lines))
+                            .Where(num => num.symbols.Any(x => x.Letter == '*'));
+
+    var stars = partsNextToStars
+                .SelectMany(ts => ts.symbols.Where(i => i.Letter == '*'))
+                .Distinct();
+
+    var starGroups = stars
+                    .Select(star => partsNextToStars.Where(ns => ns.symbols.Contains(star)))
+                    .Where(group => group.Count() == 2);
+
+    var groupPows = starGroups
+                    .Select(group => group.Select(x => x.number).Aggregate((x, y) => x * y));
+
+    groupPows
+    .Sum()
+    .Dump();
+}
 
 
 const string data = """
