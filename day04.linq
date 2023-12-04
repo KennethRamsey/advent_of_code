@@ -12,10 +12,10 @@ void part1()
                 .Split(Environment.NewLine)
                 .Select(l => l.Split(':')[1])
                 .Select(l => l.Split('|'))
-                .Select(ar => (nums(ar[0]), nums(ar[1])));
+                .Select(ar => (winNums: nums(ar[0]), ticketNums: nums(ar[1])));
 
     bothNumbers
-    .Select(n => (n.Item2.Length + 10) - (n.Item2.Union(n.Item1)).Count())
+    .Select(n => (n.ticketNums.Length + 10) - (n.ticketNums.Union(n.winNums)).Count())
     .Select(n => n == 0 ? 0 : Math.Pow(2, n - 1))
     .Sum()
     .Dump();
@@ -33,11 +33,11 @@ void part2()
                     .Split(Environment.NewLine)
                     .Select(l => l.Split(':')[1])
                     .Select(l => l.Split('|'))
-                    .Select(ar => (nums(ar[0]), nums(ar[1])))
+                    .Select(ar => (winNums: nums(ar[0]), ticketNums: nums(ar[1])))
                     .Select(n =>
                     {
-                        var wins = (n.Item2.Length + 10) - (n.Item2.Union(n.Item1)).Count();
-                        return (n.Item1, n.Item2, wins);
+                        var winMatches = (n.ticketNums.Length + 10) - (n.ticketNums.Union(n.winNums)).Count();
+                        return (n.winNums, n.ticketNums, winMatches);
                     })
                     .ToArray();
 
@@ -49,7 +49,7 @@ void part2()
         //init 1
         counts[i] += 1;
 
-        for (int j = 1; j <= bothNumbers[i].wins; j++)
+        for (int j = 1; j <= bothNumbers[i].winMatches; j++)
         {
             counts[i + j] += counts[i];
         }
