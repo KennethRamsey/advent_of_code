@@ -98,7 +98,7 @@ void part2attempt1()
 
 void part2attempt1WorkingRecursiveParser()
 {
-    // this parses all the combos!
+    // this parses all the word combos!
 
     var p1 = Parse.String("one").Return(new[] { 1 });
     var p2 = Parse.String("two").Return(new[] { 2 });
@@ -110,14 +110,13 @@ void part2attempt1WorkingRecursiveParser()
     var p8 = Parse.String("eight").Return(new[] { 8 });
     var p9 = Parse.String("nine").Return(new[] { 9 });
 
-    Parser<IEnumerable<int>>
-    oneCombo = null,
-    twoCombo = null,
-    threeCombo = null,
-    fiveCombo = null,
-    sevenCombo = null,
-    eightCombo = null,
-    nineCombo = null;
+    Parser<IEnumerable<int>> oneCombo = null,
+                        twoCombo = null,
+                        threeCombo = null,
+                        fiveCombo = null,
+                        sevenCombo = null,
+                        eightCombo = null,
+                        nineCombo = null;
 
     oneCombo =
         from _1 in Parse.String("on")
@@ -159,16 +158,16 @@ void part2attempt1WorkingRecursiveParser()
 
     var wordNumber = p1.Or(p2).Or(p3).Or(p4).Or(p5).Or(p6).Or(p7).Or(p8).Or(p9);
     var numberChar =
-            from c in Parse.Digit
-            select new[] { c - '0' };
+            from digit in Parse.Digit
+            select new[] { digit - '0' };
 
     var allNumbers = combos.Or(numberChar).Or(wordNumber);
 
-    var nonNum = Parse.AnyChar.Return(new[] { -1 });
+    var nonNum = Parse.AnyChar.Return(Array.Empty<int>()); // return no number.
 
     var fullLineParser =
-        from c in allNumbers.Or(nonNum).Many()
-        select c.SelectMany(x => x).Where(x => x != -1);
+        from num in allNumbers.Or(nonNum).Many()
+        select num.SelectMany(x => x);
 
     data
     .Split(Environment.NewLine)
