@@ -122,19 +122,23 @@ void part2()
 
     var nums = lines
                 .Select(NumsAndIndexes)
-                .SelectMany(x => x);
+                .SelectMany(x => x)
+                .ToArray();
 
     var partsNextToStars = nums
                             .Select(n => WithSymbols(n, lines))
-                            .Where(num => num.symbols.Any(x => x.Letter == '*'));
+                            .Where(num => num.symbols.Any(x => x.Letter == '*'))
+                            .ToArray();
 
     var stars = partsNextToStars
                 .SelectMany(ts => ts.symbols.Where(i => i.Letter == '*'))
-                .Distinct();
+                .Distinct()
+                .ToArray();
 
     var starGroups = stars
                     .Select(star => partsNextToStars.Where(ns => ns.symbols.Contains(star)))
-                    .Where(group => group.Count() == 2);
+                    .Where(group => group.Count() == 2)
+                    .ToArray();
 
     var groupPows = starGroups
                     .Select(group => group.Select(x => x.number).Aggregate((x, y) => x * y));
