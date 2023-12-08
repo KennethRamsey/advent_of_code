@@ -20,11 +20,11 @@ void part1()
 
     var races = nums[0].Zip(nums[1])
                    .Select(x => (time: x.First, dist: x.Second))
-                   .Dump();
+                   .Dump("races");
     races
     .Select(x => winCounts(x.time, x.dist))
     .Aggregate((x, y) => x * y)
-    .Dump();
+    .Dump("sum");
 }
 
 long winCounts(long time, long dist)
@@ -47,10 +47,10 @@ void part2()
                 .Select(x => x.Split(':')[1].Replace(" ", ""))
                 .Select(long.Parse)
                 .ToArray()
-                .Dump();
+                .Dump("big race");
 
     winCounts(nums[0], nums[1])
-    .Dump();
+    .Dump("counts");
 }
 
 
