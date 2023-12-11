@@ -24,7 +24,7 @@ void part1()
         }
     }
 
-    // gor cols.
+    // grow cols.
     for (int col = 0; col < lines[0].Length; col++)
     {
         if (lines.Select(lin => lin[col]).All(c => c == '.'))
@@ -68,7 +68,6 @@ void part2()
         if (lines[i].All(x => x == '.'))
         {
             lines[i] = lines[i].Replace('.', 'x');
-            i++;
         }
     }
 
@@ -81,8 +80,6 @@ void part2()
             {
                 lines[j] = lines[j].Substring(0, col) + 'x' + lines[j].Substring(col + 1);
             }
-
-            col++;
         }
     }
 
@@ -115,8 +112,6 @@ void part2()
             var chr = lines[y][x];
             yield return lines[y][x];
         }
-
-        x = xs[1];
 
         for (; y < ys[1]; y++)
         {
