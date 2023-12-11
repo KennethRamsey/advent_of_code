@@ -1,10 +1,12 @@
-<Query Kind="Program" />
+<Query Kind="Program">
+  <AutoDumpHeading>true</AutoDumpHeading>
+</Query>
 
 void Main()
 {
     part1();
     part2();
-    part2a();
+    part2LCM();
 }
 
 void part1()
@@ -14,27 +16,27 @@ void part1()
             .Split(Environment.NewLine)
             .First();
 
-
     var map = d
             .Split(Environment.NewLine)
             .Skip(2)
             .Select(line => (line.Substring(0, 3), line.Substring(7, 3), line.Substring(12, 3)))
             .ToDictionary(x => x.Item1, x => (left: x.Item2, right: x.Item3));
 
-    var at = "AAA";
+
+    var me = "AAA";
     var count = 0;
 
-    for (int j = 0; j < 100; j++)
+    for (; ; )
     {
         for (int i = 0; i < dirs.Length; i++)
         {
             var step = dirs[i];
-            var place = map[at];
+            var place = map[me];
             var next = step == 'L' ? place.left : place.right;
 
-            at = next;
+            me = next;
             count++;
-            if (at == "ZZZ")
+            if (me == "ZZZ")
             {
                 goto end;
             }
@@ -52,9 +54,7 @@ void part2()
     var d = data;
     var dirs = d
             .Split(Environment.NewLine)
-            .First()
-            .Dump();
-
+            .First();
 
     var map = d
             .Split(Environment.NewLine)
@@ -62,13 +62,10 @@ void part2()
             .Select(line => (line.Substring(0, 3), line.Substring(7, 3), line.Substring(12, 3)))
             .ToDictionary(x => x.Item1, x => (left: x.Item2, right: x.Item3));
 
-
     var starts = map
             .Where(m => m.Key[2] == 'A')
             .Select(m => m.Key)
-            .ToArray()
-            .Dump("starts");
-
+            .ToArray();
 
 
     foreach (var start in starts)
@@ -94,8 +91,8 @@ void part2()
         }
 
     end:
-        count.Dump();
-
+        count.Dump("finished");
+        
     }
 
     /*
@@ -108,11 +105,12 @@ void part2()
     */
 }
 
-void part2a()
+
+void part2LCM()
 {
     var nums = new[]
     {
-        13207l,
+        13207L,
         22199,
         14893,
         16579,
@@ -129,24 +127,20 @@ void LCM(long[] input)
 
     for (; ; )
     {
-        if (copy.All(c => c == copy[^1])) // all are the same.
-        {
+        if (copy.All(c => c == copy[^1])) // all are the same.        
             break;
-        }
 
         var max = copy.Max();
         for (int i = 0; i < input.Length; i++)
         {
             if (copy[i] < max)
-            {
                 copy[i] += input[i];
-            }
         }
     }
 
     copy.Dump("LCM");
+    copy[0].Dump();
 }
-
 
 
 const string data2 = """
