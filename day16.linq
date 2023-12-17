@@ -63,7 +63,7 @@ async Task<int> part1(int startRow, int startCol, char startDir)
     // poll to see when actor is done.
     for (; ; )
     {
-        await Task.Delay(100);
+        await Task.Delay(1);
         if (Processor.InputCount == 0) break;
     }
 
@@ -96,9 +96,7 @@ record light(int row, int col, char directionChar)
 async Task part2()
 {
     var grid = data
-                 .Split(Environment.NewLine)
-                 .Select(d => d.ToCharArray())
-                 .ToArray();
+                 .Split(Environment.NewLine);
 
     var rows = grid.Length;
     var cols = grid[0].Length;
