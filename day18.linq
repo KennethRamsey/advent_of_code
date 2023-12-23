@@ -4,137 +4,112 @@
   <AutoDumpHeading>true</AutoDumpHeading>
 </Query>
 
-
 void Main()
 {
-    //part1();
+    part1();
     part2();
 }
 
+void part1()
+{
+    var insts = data
+                .Split(Environment.NewLine)
+                .Select(line => new Inst(line))
+                .ToArray();
 
+    var current = (row: 0, col: 0);
+    var path = insts.SelectMany(pathSteps).Distinct().ToArray();//.Dump();
+    var offset = getOffset(path);
+    path = path
+            .Select(p => (p.Item1 + offset.Item1, p.Item2 + offset.Item2, p.Item3))
+            .ToArray();
 
-//void part1()
-//{
-//    var insts = data
-//                .Split(Environment.NewLine)
-//                .Select(line => new Inst(line))
-//                .ToArray()
-//                //.Dump()
-//                ;
-//
-//    // for part 2.
-//    //foreach (var x in insts)
-//    //    x.readFromColor();
-//
-//    insts.Dump();
-//
-//    for (int i = 0; i < insts.Length - 1; i++)
-//    {
-//        var a = insts[i];
-//        var b = insts[i + 1];
-//        a.setCorner(b.dir);
-//    }
-//    insts.Last().setCorner(insts.First().dir);
-//    //insts.Dump();
-//
-//    var current = (row: 0, col: 0);
-//    var path = insts.SelectMany(pathSteps).Distinct().ToArray();//.Dump();
-//    var offset = getOffset(path);
-//    path = path
-//    .Select(p => (p.Item1 + offset.Item1, p.Item2 + offset.Item2, p.Item3))
-//    .ToArray()
-//    //.Dump()
-//    ;
-//
-//    //var maxes = getMaxes(path);//.Dump();
-//
-//    //var map = getBaseMap(maxes)
-//    //.ToArray()
-//    //.Dump()
-//    ;
-//
-//    //foreach (var p in path)
-//    //    map[p.Item1][p.Item2] = p.Item3;
-//
-//    //map
-//    //.Select(p => p.CharsToString())
-//    //.ToArray()
-//    ////.Dump()
-//    //;
-//
-//    // go 1 row at a time, everytime you cross vertically, you change in/out of loop.
-//    var inside = false;
-//    var lastCorner = ' ';
-//    var area = 0;
-//
-////    for (int r = 0; r < maxes.Item1; r++)
-////    {
-////        inside = false;
-////        lastCorner = ' ';
-////
-////        for (int c = 0; c <= maxes.Item2; c++)
-////        {
-////            var loc = map[r][c];
-////
-////            if (lastCorner == ' ' && loc == '#') { lastCorner = '#'; }
-////            else if (lastCorner == '#' && loc == '.') { lastCorner = ' '; inside = !inside; }
-////
-////            else if (lastCorner == ' ' && loc == '┌') { lastCorner = '┌'; }
-////            else if (lastCorner == '┌' && loc == '┘') { lastCorner = ' '; inside = !inside; }
-////            else if (lastCorner == '┌' && loc == '┐') { lastCorner = ' '; }
-////
-////            else if (lastCorner == ' ' && loc == '└') { lastCorner = '└'; }
-////            else if (lastCorner == '└' && loc == '┐') { lastCorner = ' '; inside = !inside; }
-////            else if (lastCorner == '└' && loc == '┘') { lastCorner = ' '; }
-////
-////            if (loc == '.' && inside) { area++; }
-////            if (loc != '.') { area++; } // is edge.
-////        }
-////    };
-//
-//    area.Dump();
-//
-//
-//
-//
-////    IEnumerable<(int, int, corType)> pathSteps(Inst inst)
-////    {
-////        var d = inst.len;
-////        var start = current;
-////        var end = inst.dir switch
-////        {
-////            "U" => (row: start.row - d, col: start.col),
-////            "D" => (row: start.row + d, col: start.col),
-////            "L" => (row: start.row, col: start.col - d),
-////            "R" => (row: start.row, col: start.col + d),
-////        };
-////
-////        current = end; // update now.
-////
-////        if (inst.dir == "U")
-////        {
-////            for (int row = start.row - 1; row > end.row; row--)
-////                yield return (row, start.col, '#');
-////        }
-////        else if (inst.dir == "D")
-////        {
-////            for (int row = start.row + 1; row < end.row; row++)
-////                yield return (row, start.col, '#');
-////        }
-////        else if (inst.dir == "L")
-////        {
-////            for (int col = start.col - 1; col > end.col; col--)
-////                yield return (start.row, col, '#');
-////        }
-////        else if (inst.dir == "R")
-////        {
-////            for (int col = start.col + 1; col < end.col; col++)
-////                yield return (start.row, col, '#');
-////        }
-////
-////        yield return (end.row, end.col, inst.cornerAtEnd);
-////    }
-//}
+    var maxes = getMaxes(path);//.Dump();
+
+    var map = getBaseMap(maxes)
+                .ToArray();
+
+    foreach (var p in path)
+        map[p.Item1][p.Item2] = p.Item3;
+
+    map
+    .Select(p => p.CharsToString())
+    .ToArray()
+    .Dump(); // cool map.
+
+    //go 1 row at a time, everytime you cross vertically, you change in/out of loop.
+    var inside = false;
+    var lastCorner = ' ';
+    var area = 0;
+
+    for (int r = 0; r < maxes.Item1; r++)
+    {
+        inside = false;
+        lastCorner = ' ';
+
+        for (int c = 0; c <= maxes.Item2; c++)
+        {
+            var loc = map[r][c];
+
+            if (lastCorner == ' ' && loc == '#') { lastCorner = '#'; }
+            else if (lastCorner == '#' && loc == '.') { lastCorner = ' '; inside = !inside; }
+
+            else if (lastCorner == ' ' && loc == '┌') { lastCorner = '┌'; }
+            else if (lastCorner == '┌' && loc == '┘') { lastCorner = ' '; inside = !inside; }
+            else if (lastCorner == '┌' && loc == '┐') { lastCorner = ' '; }
+
+            else if (lastCorner == ' ' && loc == '└') { lastCorner = '└'; }
+            else if (lastCorner == '└' && loc == '┐') { lastCorner = ' '; inside = !inside; }
+            else if (lastCorner == '└' && loc == '┘') { lastCorner = ' '; }
+
+            if (loc == '.' && inside) { area++; }
+            if (loc != '.') { area++; } // is edge.
+        }
+    };
+
+    area.Dump();
+
+    //////////////
+
+    IEnumerable<(int, int, char)> pathSteps(Inst inst)
+    {
+        var d = inst.len;
+        var start = current;
+        var end = inst.dir switch
+        {
+            "U" => (row: start.row - d, col: start.col),
+            "D" => (row: start.row + d, col: start.col),
+            "L" => (row: start.row, col: start.col - d),
+            "R" => (row: start.row, col: start.col + d),
+        };
+
+        current = end; // update now.
+
+        if (inst.dir == "U")
+        {
+            for (int row = start.row - 1; row > end.row; row--)
+                yield return (row, start.col, '#');
+        }
+        else if (inst.dir == "D")
+        {
+            for (int row = start.row + 1; row < end.row; row++)
+                yield return (row, start.col, '#');
+        }
+        else if (inst.dir == "L")
+        {
+            for (int col = start.col - 1; col > end.col; col--)
+                yield return (start.row, col, '#');
+        }
+        else if (inst.dir == "R")
+        {
+            for (int col = start.col + 1; col < end.col; col++)
+                yield return (start.row, col, '#');
+        }
+
+        yield return (end.row, end.col, '#');
+    }
+}
+
 
 IEnumerable<char[]> getBaseMap((int, int) maxes)
 {
@@ -142,9 +117,9 @@ IEnumerable<char[]> getBaseMap((int, int) maxes)
         yield return new string('.', maxes.Item2 + 1).ToCharArray();
 }
 
-(long, long) getOffset(corner[] point)
+(int, int) getOffset((int, int, char)[] point)
 {
-    return (-point.Select(p => p.row).Min(), -point.Select(p => p.col).Min());
+    return (-point.Select(p => p.Item1).Min(), -point.Select(p => p.Item2).Min());
 }
 
 (int, int) getMaxes((int, int, char)[] point)
@@ -152,36 +127,20 @@ IEnumerable<char[]> getBaseMap((int, int) maxes)
     return (point.Select(p => p.Item1).Max(), point.Select(p => p.Item2).Max());
 }
 
+
 record Inst
 {
     public string line, dir, color;
-    public corType cornerAtEnd;
     public int len;
 
     public Inst(string line)
     {
-        var a = line.Split(' ');
+        var seg = line.Split(' ');
         this.line = line;
-        this.dir = a[0];
-        this.len = int.Parse(a[1]);
-        this.color = a[2].Substring(2, 6);
+        this.dir = seg[0];
+        this.len = int.Parse(seg[1]);
+        this.color = seg[2].Substring(2, 6);
     }
-
-    internal void setCorner(string nextDir)
-    {
-        cornerAtEnd = (dir, nextDir) switch
-        {
-            ("U", "R") => corType.upLeft,
-            ("L", "D") => corType.upLeft,
-            ("R", "D") => corType.upRight,
-            ("U", "L") => corType.upRight,
-            ("L", "U") => corType.downRight,
-            ("D", "R") => corType.downRight,
-            ("D", "L") => corType.downLeft,
-            ("R", "U") => corType.downLeft,
-        };
-    }
-
 
     internal void readFromColor()
     {
@@ -204,33 +163,11 @@ record Inst
                 .Sum();
     }
 
-    int hexToDecimal(byte hex, int ind)
+    static int hexToDecimal(byte hex, int ind)
     {
         return (int)(hex * Math.Pow(16, ind * 2));
     }
 }
-
-
-enum corType // naming from origin.
-{
-    upRight,
-    upLeft,
-    downRight,
-    downLeft,
-}
-
-static (int, int) upRight = (1, 1);
-static (int, int) upLeft = (-1, 1);
-static (int, int) downRight = (1, -1);
-static (int, int) downLeft = (-1, -1);
-
-static Dictionary<corType, (int, int)> newDict = new()
-{
-    {corType.upRight, upRight},
-    {corType.upLeft, upLeft},
-    {corType.downRight, downRight},
-    {corType.downLeft, downLeft},
-};
 
 
 void part2()
@@ -240,26 +177,14 @@ void part2()
                 .Select(line => new Inst(line))
                 .ToArray();
 
-    // for part 2.
     foreach (var x in insts)
         x.readFromColor();
 
-    for (int i = 0; i < insts.Length - 1; i++)
-    {
-        var a = insts[i];
-        var b = insts[i + 1];
-        a.setCorner(b.dir);
-    }
-    insts.Last().setCorner(insts.First().dir);
-    insts.Dump();
-
-
     var current = (row: 0, col: 0);
-    var corners = insts.SelectMany(cornerCordinates).ToArray().Dump();
+    var corners = insts.SelectMany(cornerCordinates).ToArray();
 
     // use Gauss's magic shoelace area formula.
     // https://www.youtube.com/watch?v=0KjG8Pg6LGk
-
 
     var sum = BigInteger.Zero;
 
@@ -269,28 +194,21 @@ void part2()
         var c2 = corners[i + 1];
         sum += new BigInteger(c1.col) * c2.row - new BigInteger(c1.row) * c2.col;
     }
-
+    // final pair.
     var c3 = corners.Last();
     var c4 = corners.First();
     sum += new BigInteger(c3.col) * c4.row - new BigInteger(c3.row) * c4.col;
-    
-    var area = (sum/2).Dump();
-    
-    expect.Dump();
-    (area - expect).Dump();
-    
-    // this is area!!!
-    // BUT, is it toooo big, something with parimiter....
-    
+
+    var area = (sum / 2).Dump();
+
+    //expect.Dump();
+    //(area - expect).Dump();
+
     var parim = insts.Select(i => i.len).Sum().Dump("parim");
-    var par2 = (parim/2).Dump();
-    //
-    //(area-parim).Dump();
-    
+    var par2 = (parim / 2).Dump();
+
     var ans = area + par2 + 1; // 1 might be from integer divs of odd nums??
     ans.Dump();
-    
-    // JUST GUESSED IT WAS RELATED TO PARIMITER AND I WAS RIGHT!!!!
 
 
     IEnumerable<corner> cornerCordinates(Inst inst)
@@ -305,30 +223,20 @@ void part2()
         };
 
         current = end;
-        yield return new corner(end.row, end.col, inst.cornerAtEnd, inst.dir);
+        yield return new corner(end.row, end.col);
     }
 }
 
-static BigInteger expect = new BigInteger(952408144115L);
-
+static long expect = 952408144115L;
 
 record corner
 {
-    public long row, col, height, width;
-    public corType cornerAtEnd;
-    public char dirFrom;
-    public BigInteger area, area2;
+    public long row, col;
 
-    public corner(long row, long col, corType cornerAtEnd, string dirFrom)
+    public corner(long row, long col)
     {
         this.row = row;
-        this.height = row + 1;
         this.col = col;
-        this.width = col + 1;
-        this.cornerAtEnd = cornerAtEnd;
-        this.dirFrom = dirFrom[0];
-
-        this.area2 = new BigInteger(height) * width;
     }
 }
 
@@ -347,14 +255,6 @@ R 2 (#7807d2)
 U 3 (#a77fa3)
 L 2 (#015232)
 U 2 (#7a21e3)
-""";
-
-const string data3 = """
-
-""";
-
-const string data4 = """
-
 """;
 
 const string data = """
