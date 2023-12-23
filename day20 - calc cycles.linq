@@ -71,6 +71,152 @@ IEnumerable<long> num4Gen()
 }
 
 
+// use a website to view.
+const string mermaid = """
+flowchart TD
+
+button --> broadcaster
+
+broadcaster --> cx
+broadcaster --> zq
+broadcaster --> tv
+broadcaster --> rh
+
+gh --> tv
+gh --> lk
+gh --> sz
+gh --> bh
+gh --> vx
+xc --> bm
+xc --> zq
+xc --> jf
+xc --> hg
+xc --> bd
+xc --> hn
+cn --> sh
+cn --> jd
+cn --> cx
+cn --> tc
+cn --> xd
+
+subgraph one
+    hz --> xj
+    hz --> cs
+    hz --> rh
+    fz --> hz
+    fz --> zs
+    zs --> cz
+    dt --> sq
+    dt --> hz
+    sq --> th
+    rh --> mr
+    mr --> hz
+    mr --> gz
+    gz --> gs
+    gs --> cs
+    gs --> hz
+end
+hz --> zs
+xj --> fz
+hz --> mz
+
+cd --> jx
+cd --> gh
+bk --> jp
+bk --> cn
+px --> xc
+px --> hg
+tv --> gh
+tv --> xl
+
+bd --> px
+
+dx --> cn
+dx --> rb
+vv --> pp
+vv --> gh
+
+
+rb --> cn
+rb --> qr
+
+jd --> mm
+cx --> xd
+cx --> cn
+
+hn --> bm
+xr --> bd
+xr --> xc
+
+zq --> kg
+zq --> xc
+
+cs --> xj
+fb --> tc
+fb --> cn
+mm --> cn
+mm --> bk
+
+sq --> hz
+sz --> vx
+xl --> gh
+xl --> sz
+vm --> gh
+vm --> vv
+jp --> cn
+qr --> cn
+qr --> jd
+bq --> xc
+bq --> zv
+
+
+gz --> hz
+qc --> qg
+qc --> xc
+hg --> bq
+
+
+qs --> gh
+
+qg --> xc
+pp --> qs
+pp --> gh
+zv --> xc
+zv --> qc
+rh --> hz
+
+
+th --> hz
+
+bm --> xr
+lk --> pg
+jx --> lk
+jx --> gh
+
+tc --> dx
+
+xd --> jk
+pg --> vm
+pg --> gh
+kg --> hn
+kg --> xc
+
+vx --> cd
+cz --> hz
+cz --> dt
+jk --> cn
+jk --> fb
+
+
+bh --> mf
+jf --> mf
+sh --> mf
+mz --> mf
+
+mf --> rx
+""";
+
+
 const string data1 = """
 (3919, 1)
 (7838, 2)
