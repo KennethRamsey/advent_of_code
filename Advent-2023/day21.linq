@@ -1,29 +1,32 @@
-<Query Kind="Program" />
+<Query Kind="Program">
+  <AutoDumpHeading>true</AutoDumpHeading>
+</Query>
 
 
 void Main()
 {
     //part1();
+    part2Brute();
     part2();
 }
 
 void part1()
 {
-    var map = data2
+    var map = data
                 .Split(Environment.NewLine);
 
     Rows = map.Length;
     Cols = map[0].Length;
 
-    var start = findStart(map).Dump();
+    var start = findStart(map);
 
-    var points = new List<(int, int)> { start };
-    var rez = new List<(int, int)> { };
+    var points = new List<plot> { start };
+    var rez = new List<plot> { };
 
     for (int step = 0; step < 1; step++)
     {
         foreach (var p in points)
-            addNextSteps(p, map, rez);
+            addNextStepsOnlyInGrid(p, map, rez);
 
         points = rez.Distinct().ToList();
         rez = new();
@@ -34,24 +37,23 @@ void part1()
 
 static int Rows, Cols;
 
-void addNextSteps((int, int) p, string[] map, List<(int, int)> rez)
+void addNextStepsOnlyInGrid(plot p, string[] map, List<plot> rez)
 {
     var opts = new[]
     {
-        (p.Item1-1, p.Item2),
-        (p.Item1+1, p.Item2),
-        (p.Item1, p.Item2-1),
-        (p.Item1, p.Item2+1),
+        p with {totalRow = p.totalRow-1},
+        p with {totalRow = p.totalRow+1},
+        p with {totalCol = p.totalCol-1},
+        p with {totalCol = p.totalCol+1},
     };
 
     foreach (var o in opts)
     {
-        var inMap = (0 <= o.Item1 && o.Item1 <= Rows)
-                    && (0 <= o.Item2 && o.Item2 <= Cols);
+        var inMap = o.mapRow == 0 && o.mapCol == 0;
         if (!inMap)
-            continue;
+            continue; // skip.
 
-        if (map[o.Item1][o.Item2] != '#')
+        if (map[o.totalRow][(int)o.totalCol] != '#')
             rez.Add(o);
     }
 }
@@ -73,14 +75,14 @@ void addNextStepsInf(plot p, string[] map, HashSet<plot> rez)
     }
 }
 
-(int, int) findStart(string[] map)
+plot findStart(string[] map)
 {
     for (int row = 0; row < map.Length; row++)
     {
         var col = map[row].IndexOf('S');
         if (col > -1)
         {
-            return (row, col);
+            return new plot(row, col);
         }
     }
     throw null;
@@ -91,8 +93,8 @@ record plot(long totalRow, long totalCol)
 {
     public int row { get => newMod(totalRow, Rows); }
     public int col { get => newMod(totalCol, Cols); }
-    public int mapRow { get => (int)(totalRow / Rows); }
-    public int mapCol { get => (int)(totalRow / Cols); }
+    public int mapRow { get => (int)(Math.Floor(totalRow / (double)Rows)); }
+    public int mapCol { get => (int)(Math.Floor(totalCol / (double)Cols)); }
 
     static int newMod(long num, int mod)
     {
@@ -101,17 +103,17 @@ record plot(long totalRow, long totalCol)
     }
 }
 
-void part2()
+void part2Brute()
 {
-    var map = data2
+    var map = data
                 .Split(Environment.NewLine);
 
-    Rows = map.Length;
+    Rows = map.Length.Dump("Row and Col Lengths");
     Cols = map[0].Length;
 
     var start = findStart(map);
 
-    var plots1 = new HashSet<plot> { new plot(start.Item1, start.Item2) };
+    var plots1 = new HashSet<plot> { start };
     var plots1New = new HashSet<plot> { };
     var plots2 = new HashSet<plot> { };
     var plots2New = new HashSet<plot> { };
@@ -119,9 +121,10 @@ void part2()
     long sum1 = 1;
     long sum2 = 0;
 
-    var totSteps = 50000; // 5k intially took 3+ mins, now it's 11 secs...
-                         // 10k took 41 sec... this aint fast enough...
-                         // 50k took too 19min,24s.  == 1673523504
+    var totSteps = 65 + (131 * 3);
+    // 5k intially took 3+ mins, now it's 11 secs...
+    // 10k took 41 sec... this aint fast enough...
+    // 50k took too 19min,24s.  == 1673523504
     $"working on {totSteps}".Dump();
 
     for (int step = 0; step < totSteps; step++)
@@ -150,14 +153,199 @@ void part2()
     }
 
     if (totSteps % 2 == 0)
-        sum1.Dump();
+        sum1.Dump("BRUTE ANSWER");
     else
-        sum2.Dump();
+        sum2.Dump("BRUTE ANSWER");
+
+    "------------".Dump();
 }
 
 
+void part2()
+{
+    var map = data
+                .Split(Environment.NewLine);
 
-const string data2 = """
+    Rows = map.Length;//.Dump();
+    Cols = map[0].Length;//.Dump();
+
+    var start = findStart(map);
+
+    // CAN ONLY REACH ODD SPOTS!
+    long plotsPerMap = map.Where((m, i) => i % 2 == 0)
+                        .Sum(lin => lin.Where((c, i) => i % 2 == 0)
+                                        .Count(c => c != '#'));
+    plotsPerMap.Dump();
+
+
+    // the straight paths from Start, and on the edges let elf got to all maps easily.
+    long totSteps = 65 + (131 * 3);
+
+    long stepsTo1stEdge = (Cols - 1) / 2;
+    //stepsTo1stEdge;.Dump();
+
+    long fullMapsIn1Direction = (totSteps - stepsTo1stEdge) / Cols;
+    //(totSteps - stepsTo1stEdge).Dump(); // perfect fit.
+    //(fullMapsIn1Direction * Cols).Dump();
+    fullMapsIn1Direction -= 1; // goes to very end of last map, but it's not full.
+    fullMapsIn1Direction.Dump();
+
+    //var stepsTo1stEdgeOfCornerBlock = stepsTo1stEdge + (Cols * (fullMapsIn1Direction - 1)) + 1;
+    //var remainingCornerSteps = totSteps - stepsTo1stEdgeOfCornerBlock;
+    var remainingCornerSteps = 130;
+    remainingCornerSteps.Dump();
+
+    // AHH, this is going to the final edge of a full block!
+
+    //var stepsToCornerOfDiagonalBlock = stepsTo1stEdge + (Cols * (fullBlocksIn1Direction - 1)) + 1 + stepsTo1stEdge + 1;
+    //var remainingDiagonalSteps = totSteps - stepsToCornerOfDiagonalBlock;
+    //remainingDiagonalSteps.Dump();
+
+    long diagonalLargerSteps = (130 + 131 - 66); // assume for now.
+    long diagonalSmallerSteps = (130 - 66); // assume for now.
+
+    var allCorners = AllCorners();//.Dump();
+    var allSides = AllSides();//.Dump();
+
+    CountFromPosition(start, map, 21+131).Dump();
+
+    long sum = 0L;
+
+    // add fullblocks.
+    var fullMapCounts = Math.Pow(fullMapsIn1Direction + 1, 2) + Math.Pow(fullMapsIn1Direction, 2);
+    sum += plotsPerMap * (long)fullMapCounts.Dump();
+
+    // add corners.
+    foreach (var s in allSides)
+        sum += CountFromPosition(s, map, remainingCornerSteps) * 1;
+
+    // add 3/4 blocks
+    foreach (var c in allCorners)
+        sum += CountFromPosition(c, map, diagonalLargerSteps) * fullMapsIn1Direction;
+
+    // add 1/4 blocks
+    foreach (var c in allCorners)
+        sum += CountFromPosition(c, map, diagonalSmallerSteps) * (fullMapsIn1Direction + 1);
+
+    sum.Dump();
+
+    "------------".Dump();
+    long _4corSum = 0;
+    foreach (var s in allSides)
+        _4corSum += CountFromPosition(s, map, remainingCornerSteps) * 1;
+
+    long _4smallDagSum = 0;
+    foreach (var c in allCorners)
+        _4smallDagSum += CountFromPosition(c, map, diagonalSmallerSteps);
+
+    (_4corSum + _4smallDagSum).Dump();
+
+    long _4largeDiagSum = 0;
+    foreach (var c in allCorners)
+        _4largeDiagSum += CountFromPosition(c, map, diagonalLargerSteps);
+
+    (_4largeDiagSum + _4smallDagSum).Dump();
+
+    long infoSum = 0L;
+
+    long sum1 = part1inf(65 + 131);
+    long _4Corners_4SmallDiags = sum1 - plotsPerMap; // just 1 full map.
+    //_4Corners_4SmallDiags.Dump();
+
+    long sum2 = part1inf(65 + 131 + 131);
+    long _4Corners_8SmallDiags_4BigDiags = sum2 - (5 * plotsPerMap);
+    //_4Corners_8SmallDiags_4BigDiags.Dump();
+
+    long _4smallDiags_4BigDiags = _4Corners_8SmallDiags_4BigDiags - _4Corners_4SmallDiags;
+
+
+    infoSum += plotsPerMap * (long)fullMapCounts;
+    infoSum += _4smallDiags_4BigDiags * fullMapsIn1Direction * 4;
+    infoSum += _4Corners_4SmallDiags;
+    infoSum -= 288;
+    infoSum.Dump();
+
+
+
+
+    // 97493707083 too low...
+    // 97493706932 too low...
+    // 97493706887 too low...
+    // 610164219573432
+    // 610158187362102
+    // 1220659376076999 no info....
+    // 1220659376077195 no info...
+    // 1220649789636094 no info...
+    // 1220637722013841 no info
+    // 1220632535651521 no info...
+    // 1220631743456748 no info...
+}
+
+
+int CountFromPosition(plot start, string[] map, long steps)
+{
+    var points = new List<plot> { start };
+    var rez = new List<plot> { };
+
+    for (int step = 0; step < steps; step++)
+    {
+        foreach (var p in points)
+            addNextStepsOnlyInGrid(p, map, rez);
+
+        points = rez.Distinct().ToList();
+        rez = new();
+    }
+
+    return points.Count;//.Dump();
+}
+
+int part1inf(int steps)
+{
+    var map = data
+                .Split(Environment.NewLine);
+
+    Rows = map.Length;
+    Cols = map[0].Length;
+
+    var start = findStart(map);
+
+    var points = new HashSet<plot> { start };
+    var rez = new HashSet<plot> { };
+
+    for (int step = 0; step < steps; step++)
+    {
+        foreach (var p in points)
+            addNextStepsInf(p, map, rez);
+
+        points = rez;
+        rez = new();
+    }
+
+    return points.Count;
+}
+
+
+plot[] AllSides()
+{
+    return new[] {
+        new plot((Rows/2), 0),
+        new plot(Rows-1, (Cols/2)),
+        new plot((Rows/2), Cols-1),
+        new plot(0, (Cols/2)),
+    };
+}
+
+plot[] AllCorners()
+{
+    return new[] {
+        new plot(0, 0),
+        new plot(Rows-1, 0),
+        new plot(0, Cols-1),
+        new plot(Rows-1, Cols-1),
+    };
+}
+
+const string data212313123 = """
 ...........
 .....###.#.
 .###.##..#.
