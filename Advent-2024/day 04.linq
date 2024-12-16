@@ -1,5 +1,4 @@
 <Query Kind="Program">
-  <Namespace>System.Windows.Media</Namespace>
   <AutoDumpHeading>true</AutoDumpHeading>
 </Query>
 
@@ -91,7 +90,7 @@ void part1()
 
 void part2()
 {
-    var lines = data2
+    var lines = data3
                 .Split(Environment.NewLine)
                 .ToArray();
 
