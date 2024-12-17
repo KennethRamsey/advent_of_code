@@ -8,6 +8,8 @@ void Main()
     part1and2();
 }
 
+
+
 void part1and2()
 {
     var nums = data2
@@ -19,36 +21,38 @@ void part1and2()
 
     IEnumerable<long> rocks = nums;
 
+    // part 1
     for (int i = 0; i < 25; i++)
     {
-        rocks = rocks.SelectMany(Next).ToArray();
+        rocks = rocks.SelectMany(NextRocks);
     }
 
     rocks.Count().Dump();
 
-    IEnumerable<(long, long)> rockPiles = nums
-                                        .GroupBy(n => n)
-                                        .Select(g => (g.Key, (long)g.Count()));
+    // part 2
+    IEnumerable<(long num, long count)> rockPiles = nums
+                                                    .GroupBy(n => n)
+                                                    .Select(g => (g.Key, (long)g.Count()));
     for (int i = 0; i < 75; i++)
     {
         rockPiles = rockPiles
-                    .SelectMany(NextPiles)
-                    .GroupBy(p => p.num)
+                    .SelectMany(NextPiles) 
+                    .GroupBy(p => p.num) // combine like groups
                     .Select(g => (g.Key, g.Select(p => p.count).Sum()));
     }
 
     rockPiles
-    .Select(p => p.Item2)
+    .Select(p => p.count)
     .Sum()
     .Dump();
 }
 
 IEnumerable<(long num, long count)> NextPiles((long num, long count) pile)
 {
-    return Next(pile.num).Select(n => (n, pile.count));
+    return NextRocks(pile.num).Select(n => (n, pile.count));
 }
 
-IEnumerable<long> Next(long n)
+IEnumerable<long> NextRocks(long n)
 {
     if (n == 0)
     {
