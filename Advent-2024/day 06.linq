@@ -21,7 +21,7 @@ enum Dir { Up, Right, Down, Left }
 
 record Map
 {
-    public int height, width, StartX, StartY;
+    public int Height, Width, StartX, StartY;
     public Dir StartDir;
     public string[] Lines;
     private HashSet<(int, int, Dir)> SeenAndDir;
@@ -33,13 +33,13 @@ record Map
         Lines = data.Split(Environment.NewLine)
                     .ToArray();
 
-        height = Lines.Length;
-        width = Lines[0].Length;
+        Height = Lines.Length;
+        Width = Lines[0].Length;
 
         StartX = 0;
         StartY = 0;
 
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < Height; i++)
         {
             var line = Lines[i];
             if (hasStart(line))
@@ -134,8 +134,8 @@ record Map
 
     bool offMap(int nextX, int nextY)
     {
-        var inMap = 0 <= nextX && nextX < width
-                    && 0 <= nextY && nextY < height;
+        var inMap = 0 <= nextX && nextX < Width
+                    && 0 <= nextY && nextY < Height;
         return !inMap;
     }
 
